@@ -16,13 +16,28 @@
 
 
 #define SMPLRT_DIV_REG 0x19 //Sample rate divider
-#define GYRO_CONFIG_REG 0x1B //Gyroscope configuration
-#define ACCEL_CONFIG_REG 0x1C //accelerometer configuration
-#define ACCEL_XOUT_H_REG 0x3B //accelerometer measurements
-#define TEMP_OUT_H_REG 0x41 // temperature measurement
-#define GYRO_XOUT_H_REG 0x43 //gyroscope measurements
 #define PWR_MGMT_1_REG 0x6B //Power management 1
-#define WHO_AM_I_REG 0x75 //who am I
+#define WHO_AM_I_REG 0x75 //Who am I
+
+#define ACCEL_CONFIG_REG 0x1C //Accelerometer configuration
+#define ACCEL_XOUT_H_REG 0x3B //Accelerometer measurements
+
+#define GYRO_CONFIG_REG 0x1B //Gyroscope configuration
+#define TEMP_OUT_H_REG 0x41 //Temperature measurement
+#define GYRO_XOUT_H_REG 0x43 //Gyroscope measurements
+
+
+#define INT_PIN_CFG_REG 0x37 //Interrupt configuration
+#define INT_ENABLE_REG 0x38 //Interrupt enable
+#define INT_STATUS_REG 0x3A //Interrupt status
+
+#define FIFO_EN_REG 0x23 //Choose FIFO data
+#define FIFO_R_W_REG 0x74 //Read FIFO data
+#define FIFO_COUNT_H_REG 0x72 //FIFO count 1
+#define FIFO_COUNT_L_REG 0x73 //FIFO count 2
+#define USER_CTRL_REG 0x6A //FIFO enable
+
+
 
 extern I2C_HandleTypeDef hi2c3;
 
