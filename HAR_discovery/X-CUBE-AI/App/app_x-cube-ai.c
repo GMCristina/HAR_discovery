@@ -179,15 +179,6 @@ int acquire_and_process_data(void * data)
 
 	ai_i8 *pointer = (ai_i8*) data;
 
-	uint8_t delay;
-	while (count_first_frame < dim_frame) {
-//		MPU6050_Read_Accel ();
-//		MPU6050_Print_Accel();
-		delay = dim_frame - count_first_frame-5;
-		printf("delay %d \r\n",count_first_frame);
-//		HAL_Delay(delay);
-	};
-
 	MPU6050_Conv_Order_Frame();
 	MPU6050_Print_Frame_Part();
 
@@ -282,6 +273,12 @@ void MX_X_CUBE_AI_Process(void)
     }
 
     /* 2 - main loop */
+    printf("Attesa frame\r\n");
+	while (count_first_frame < dim_frame) {
+		printf("n_frame %d \r\n",count_first_frame);
+	};
+	printf("Frame ottenuto\r\n");
+
     do {
       /* 1 - acquire and pre-process input data */
       res = acquire_and_process_data(in_data);

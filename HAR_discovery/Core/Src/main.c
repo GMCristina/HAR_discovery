@@ -108,7 +108,7 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-//  MX_X_CUBE_AI_Process();
+  MX_X_CUBE_AI_Process();
     /* USER CODE BEGIN 3 */
 	//printf("main\r\n");
   }
@@ -521,18 +521,21 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 				tickstart = HAL_GetTick();
 
 				MPU6050_Read_Accel_Raw (idx);
+				count_first_frame++;
 
 			} else {
 				tickend = HAL_GetTick();
 				n_tick = tickend - tickstart;
 				tickstart = tickend;
-				printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
+				//printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
 				float freq = 1000/n_tick;
 				//printf("Frequenza (Hz): %f \r\n", freq);
 
 				idx = (idx + 1)%dim_frame;
 				MPU6050_Read_Accel_Raw (idx);
-
+				if (count_first_frame < dim_frame) {
+					count_first_frame++;
+				}
 			}
 
 		}
@@ -541,9 +544,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		}
 
 		//printf("N tick : %d \r\n", HAL_GetTick());
-		if (count_first_frame < dim_frame) {
-			count_first_frame++;
-		}
+
 
 	}
 }

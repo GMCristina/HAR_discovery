@@ -148,7 +148,7 @@ void MPU6050_Print_Accel(void){
 }
 
 void MPU6050_Conv_Order_Frame (void){
-	for (uint8_t j = 89; j >= 0; --j) {
+	/*for (uint8_t j = 89; j >= 0; --j) {
 		Queue_Ax[j] = (Queue_Ax_Raw[idx] / LSB_Sensitivity) * g;
 		Queue_Ay[j] = (Queue_Ay_Raw[idx] / LSB_Sensitivity) * g;
 		Queue_Az[j] = (Queue_Az_Raw[idx] / LSB_Sensitivity) * g;
@@ -157,6 +157,12 @@ void MPU6050_Conv_Order_Frame (void){
 		} else {
 			idx = idx - 1;
 		}
+	}
+	*/
+	for(uint8_t j=0;j<=dim_frame;j++){
+		Queue_Ax[j] = (Queue_Ax_Raw[j] / LSB_Sensitivity) * g;
+				Queue_Ay[j] = (Queue_Ay_Raw[j] / LSB_Sensitivity) * g;
+				Queue_Az[j] = (Queue_Az_Raw[j] / LSB_Sensitivity) * g;
 	}
 }
 
