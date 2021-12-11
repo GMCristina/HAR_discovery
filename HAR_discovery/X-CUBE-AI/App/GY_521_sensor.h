@@ -12,9 +12,11 @@
 #include "app_x-cube-ai.h"
 #include <stdio.h>
 
+
+//Sensor I2C address
 #define MPU6050_ADDR 0xD0
 
-
+//Sensor registers
 #define SMPLRT_DIV_REG 0x19 //Sample rate divider
 #define PWR_MGMT_1_REG 0x6B //Power management 1
 #define WHO_AM_I_REG 0x75 //Who am I
@@ -37,11 +39,13 @@
 #define FIFO_COUNT_L_REG 0x73 //FIFO count 2
 #define USER_CTRL_REG 0x6A //FIFO enable
 
-
+#define dim_frame 90
 
 extern I2C_HandleTypeDef hi2c3;
 
 extern float g;
+extern float LSB_Sensitivity;
+
 
 extern int16_t Accel_X_RAW;
 extern int16_t Accel_Y_RAW;
@@ -50,9 +54,24 @@ extern int16_t Accel_Z_RAW;
 
 extern float Ax, Ay, Az;
 
+extern int16_t Queue_Ax_Raw[dim_frame], Queue_Ay_Raw[dim_frame], Queue_Az_Raw[dim_frame];
+extern float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
+
+extern int16_t n_interrupts;
+extern uint8_t idx;
+
+extern int8_t flag_first;
+extern int8_t count_first_frame;
+extern uint32_t tickstart, tickend, n_tick;
+
 void MPU6050_Init (void);
 void MPU6050_Read_Accel (void);
 void MPU6050_Print_Accel(void);
+
+void MPU6050_Read_Accel_Raw (uint8_t);
+void MPU6050_Conv_Order_Frame (void);
+void MPU6050_Print_Frame (void);
+void MPU6050_Print_Frame_Part (void);
 
 
 #endif /* APP_GY_521_SENSOR_H_ */

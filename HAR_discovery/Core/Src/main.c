@@ -108,8 +108,9 @@ int main(void)
   {
     /* USER CODE END WHILE */
 
-  MX_X_CUBE_AI_Process();
+//  MX_X_CUBE_AI_Process();
     /* USER CODE BEGIN 3 */
+	//printf("main\r\n");
   }
   /* USER CODE END 3 */
 }
@@ -343,10 +344,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : B5_Pin VSYNC_Pin G2_Pin R4_Pin
-                           R5_Pin */
-  GPIO_InitStruct.Pin = B5_Pin|VSYNC_Pin|G2_Pin|R4_Pin
-                          |R5_Pin;
+  /*Configure GPIO pins : B5_Pin VSYNC_Pin G2_Pin R4_Pin */
+  GPIO_InitStruct.Pin = B5_Pin|VSYNC_Pin|G2_Pin|R4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -463,6 +462,12 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF14_LTDC;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
+  /*Configure GPIO pin : PA12 */
+  GPIO_InitStruct.Pin = GPIO_PIN_12;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
   /*Configure GPIO pins : G7_Pin B2_Pin */
   GPIO_InitStruct.Pin = G7_Pin|B2_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
@@ -494,9 +499,54 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Alternate = GPIO_AF12_FMC;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
+
 }
 
 /* USER CODE BEGIN 4 */
+// EXTI Line12 External Interrupt ISR Handler CallBackFun
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	//printf("Interrupt\r\n");
+	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
+	{
+
+		n_interrupts++;
+		if (n_interrupts == 0) {
+			if (flag_first == 1) {
+				//printf("Primo dato \r\n");
+				flag_first = 0;
+				tickstart = HAL_GetTick();
+
+				MPU6050_Read_Accel_Raw (idx);
+
+			} else {
+				tickend = HAL_GetTick();
+				n_tick = tickend - tickstart;
+				tickstart = tickend;
+				printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
+				float freq = 1000/n_tick;
+				//printf("Frequenza (Hz): %f \r\n", freq);
+
+				idx = (idx + 1)%dim_frame;
+				MPU6050_Read_Accel_Raw (idx);
+
+			}
+
+		}
+		if (n_interrupts == 1) {
+			n_interrupts = -1;
+		}
+
+		//printf("N tick : %d \r\n", HAL_GetTick());
+		if (count_first_frame < dim_frame) {
+			count_first_frame++;
+		}
+
+	}
+}
 
 /* USER CODE END 4 */
 

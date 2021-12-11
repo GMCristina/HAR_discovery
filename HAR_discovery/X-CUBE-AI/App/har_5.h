@@ -2,7 +2,7 @@
   ******************************************************************************
   * @file    har_5.h
   * @author  AST Embedded Analytics Research Platform
-  * @date    Tue Dec  7 17:02:19 2021
+  * @date    Fri Dec 10 20:20:37 2021
   * @brief   AI Tool Automatic Code Generator for Embedded NN computing
   ******************************************************************************
   * @attention

@@ -200,14 +200,13 @@ void Error_Handler(void);
 #define STLINK_TX_GPIO_Port GPIOA
 #define R4_Pin GPIO_PIN_11
 #define R4_GPIO_Port GPIOA
-#define R5_Pin GPIO_PIN_12
-#define R5_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
 #define SWCLK_GPIO_Port GPIOA
 #define TP_INT1_Pin GPIO_PIN_15
 #define TP_INT1_GPIO_Port GPIOA
+#define TP_INT1_EXTI_IRQn EXTI15_10_IRQn
 #define R2_Pin GPIO_PIN_10
 #define R2_GPIO_Port GPIOC
 #define D2_Pin GPIO_PIN_0
