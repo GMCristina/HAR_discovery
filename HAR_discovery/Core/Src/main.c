@@ -513,14 +513,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
 	{
 
-		n_interrupts++;
 		if (n_interrupts == 0) {
 			if (flag_first == 1) {
 				//printf("Primo dato \r\n");
 				flag_first = 0;
 				tickstart = HAL_GetTick();
 
-				MPU6050_Read_Accel_Raw (idx);
+				MPU6050_Read_Accel_Raw(idx);
 				count_first_frame++;
 
 			} else {
@@ -528,23 +527,22 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 				n_tick = tickend - tickstart;
 				tickstart = tickend;
 				//printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
-				float freq = 1000/n_tick;
+				float freq = 1000 / n_tick;
 				//printf("Frequenza (Hz): %f \r\n", freq);
 
-				idx = (idx + 1)%dim_frame;
-				MPU6050_Read_Accel_Raw (idx);
+				idx = (idx + 1) % dim_frame;
+				MPU6050_Read_Accel_Raw(idx);
 				if (count_first_frame < dim_frame) {
 					count_first_frame++;
 				}
 			}
+			n_interrupts++;
 
+		} else if(n_interrupts == 1) {
+			n_interrupts = 0;
+		} else {
+			n_interrupts++;
 		}
-		if (n_interrupts == 1) {
-			n_interrupts = -1;
-		}
-
-		//printf("N tick : %d \r\n", HAL_GetTick());
-
 
 	}
 }
