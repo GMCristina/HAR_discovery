@@ -60,6 +60,7 @@ extern float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
 extern int16_t n_interrupts;
 extern uint8_t idx;
 extern uint8_t n_giri;
+extern uint16_t n_campioni;
 
 extern int8_t flag_first;
 extern int8_t flag_acquire;

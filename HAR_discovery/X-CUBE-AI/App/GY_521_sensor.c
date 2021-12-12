@@ -24,7 +24,8 @@ float Ax, Ay, Az;
 
 int16_t n_interrupts = 0;
 uint8_t idx = 0;
-uint8_t n_giri = 0;
+uint16_t n_campioni = 0;
+
 
 int8_t flag_first = 1;
 int8_t flag_acquire =1;
@@ -157,24 +158,18 @@ void MPU6050_Print_Accel(void){
 void MPU6050_Conv_Order_Frame (void){
 	//printf("idx %d \r\n",idx);
 	//printf("n_giri %d \r\n",n_giri);
+	int8_t indice = idx;
 	for (int8_t j = dim_frame-1; j >= 0; j--) {
-		Queue_Ax[j] = (Queue_Ax_Raw[idx] / LSB_Sensitivity) * g;
-		Queue_Ay[j] = (Queue_Ay_Raw[idx] / LSB_Sensitivity) * g;
-		Queue_Az[j] = (Queue_Az_Raw[idx] / LSB_Sensitivity) * g;
+		Queue_Ax[j] = (Queue_Ax_Raw[indice] / LSB_Sensitivity) * g;
+		Queue_Ay[j] = (Queue_Ay_Raw[indice] / LSB_Sensitivity) * g;
+		Queue_Az[j] = (Queue_Az_Raw[indice] / LSB_Sensitivity) * g;
 		//printf("indice: %d \r\n",j);
-		if (idx == 0) {
-			idx = dim_frame-1;
+		if (indice == 0) {
+			indice = dim_frame-1;
 		} else {
-			idx--;
+			indice--;
 		}
 	}
-/*
-	for(uint8_t j=0;j<=dim_frame;j++){
-		Queue_Ax[j] = (Queue_Ax_Raw[j] / LSB_Sensitivity) * g;
-				Queue_Ay[j] = (Queue_Ay_Raw[j] / LSB_Sensitivity) * g;
-				Queue_Az[j] = (Queue_Az_Raw[j] / LSB_Sensitivity) * g;
-	}
-	*/
 }
 
 void MPU6050_Print_Frame (void){
@@ -186,7 +181,8 @@ void MPU6050_Print_Frame (void){
 
 void MPU6050_Print_Frame_Part (void){
 	printf("NEW FRAME \r\n");
-	printf("Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[0], Queue_Ay[0],Queue_Az[0]);
-	printf("Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[45], Queue_Ay[45],Queue_Az[45]);
-	printf("Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[89], Queue_Ay[89],Queue_Az[89]);
+	printf("0 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[0], Queue_Ay[0],Queue_Az[0]);
+	printf("44 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[44], Queue_Ay[44],Queue_Az[44]);
+	printf("45 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[45], Queue_Ay[45],Queue_Az[45]);
+	printf("89 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[89], Queue_Ay[89],Queue_Az[89]);
 }

@@ -176,24 +176,29 @@ static int ai_run(void *data_in, void *data_out)
 int acquire_and_process_data(void * data)
  {
 
-	/*if (flag_first_net == 1) {
-		tickstart_net = HAL_GetTick();
-		flag_first_net = 0;
-	} else {
-		tickend_net = HAL_GetTick();
-		n_tick_net = tickend_net - tickstart_net;
-		tickstart_net = tickend_net;
-		printf("Nuova rete dopo tick(ms): %d \r\n", n_tick_net);
-		float freq_net = 1000 / n_tick_net;
-		printf("Frequenza rete (Hz): %f \r\n", freq_net);
-	}
-*/
 	ai_i8 *pointer = (ai_i8*) data;
-	flag_acquire = 0;
-	MPU6050_Conv_Order_Frame();
-	flag_acquire = 1;
-	//MPU6050_Print_Frame_Part();
 
+	//Primo frame
+	if (count_first_frame == dim_frame) {
+		count_first_frame=91;
+		flag_acquire = 0;
+		n_campioni = 0;
+		for (uint8_t j = 0; j <= dim_frame; j++) {
+			Queue_Ax[j] = (Queue_Ax_Raw[j] / LSB_Sensitivity) * g;
+			Queue_Ay[j] = (Queue_Ay_Raw[j] / LSB_Sensitivity) * g;
+			Queue_Az[j] = (Queue_Az_Raw[j] / LSB_Sensitivity) * g;
+		}
+		MPU6050_Print_Frame_Part();
+	} else {
+
+	while(n_campioni!=45){}
+	flag_acquire = 0;
+	n_campioni=0;
+	MPU6050_Conv_Order_Frame();
+
+	}
+
+	MPU6050_Print_Frame_Part();
 	for (uint8_t j = 0; j < dim_frame; ++j) {
 		*(ai_float*) (pointer + j * 12) = Queue_Ax[j];
 		*(ai_float*) (pointer + j * 12 + 4) = Queue_Ay[j];
@@ -223,7 +228,7 @@ int post_process(void * data)
 
 		}
 		//printf("Somma probabilità = %.3f \r\n", somma);
-		/*
+
 		switch (classe){
 		case 1: printf("Classe: Downstairs (%d) \r\n", classe); break;
 		case 2:printf("Classe: Jogging (%d) \r\n", classe); break;
@@ -233,7 +238,7 @@ int post_process(void * data)
 		case 6:printf("Classe: Walking (%d) \r\n", classe); break;
 		}
 	  printf("Probabilità: %.2f %% \r\n", max*100);
-	  */
+
   return 0;
 }
 /* USER CODE END 2 */
@@ -294,6 +299,7 @@ void MX_X_CUBE_AI_Process(void)
 	printf("Frame ottenuto\r\n");
 
     do {
+
       /* 1 - acquire and pre-process input data */
       res = acquire_and_process_data(in_data);
       /* 2 - process the data - call inference engine */
@@ -302,6 +308,8 @@ void MX_X_CUBE_AI_Process(void)
       /* 3- post-process the predictions */
       if (res == 0)
         res = post_process(out_data);
+
+      flag_acquire = 1;
     } while (res==0);
   }
 
