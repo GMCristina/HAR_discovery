@@ -509,41 +509,55 @@ static void MX_GPIO_Init(void)
 // EXTI Line12 External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	//printf("Interrupt\r\n");
 	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
 	{
+		//if (flag_acquire == 1) {
+			if (n_interrupts == 0) {
+				if (flag_first == 1) {
+					//printf("Primo dato \r\n");
+					flag_first = 0;
+					tickstart = HAL_GetTick();
 
-		if (n_interrupts == 0) {
-			if (flag_first == 1) {
-				//printf("Primo dato \r\n");
-				flag_first = 0;
-				tickstart = HAL_GetTick();
+					MPU6050_Read_Accel_Raw(idx);
+					count_first_frame++;
 
-				MPU6050_Read_Accel_Raw(idx);
-				count_first_frame++;
-
-			} else {
-				tickend = HAL_GetTick();
-				n_tick = tickend - tickstart;
-				tickstart = tickend;
-				//printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
-				float freq = 1000 / n_tick;
-				//printf("Frequenza (Hz): %f \r\n", freq);
+				} else {
+					tickend = HAL_GetTick();
+					n_tick = tickend - tickstart;
+					tickstart = tickend;
+					//printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
+					float freq = 1000 / n_tick;
+					//printf("Frequenza (Hz): %f \r\n", freq);
 
 				idx = (idx + 1) % dim_frame;
 				MPU6050_Read_Accel_Raw(idx);
+				if (idx == 0) {
+					n_giri++;
+					if (flag_first_frame == 1) {
+						tickstart_frame = HAL_GetTick();
+						flag_first_frame = 0;
+					} else {
+						tickend_frame = HAL_GetTick();
+						n_tick_frame = tickend_frame - tickstart_frame;
+						tickstart_frame = tickend_frame;
+						printf("Nuovo frame dopo tick(ms): %d \r\n", n_tick_frame);
+						float freq_frame = 1000 / n_tick_frame;
+						printf("Frequenza frame (Hz): %f \r\n", freq_frame);
+					}
+				}
 				if (count_first_frame < dim_frame) {
 					count_first_frame++;
 				}
+				}
+				n_interrupts++;
+
+			} else if (n_interrupts == 1) {
+				n_interrupts = 0;
+			} else {
+				n_interrupts++;
 			}
-			n_interrupts++;
 
-		} else if(n_interrupts == 1) {
-			n_interrupts = 0;
-		} else {
-			n_interrupts++;
-		}
-
+		//}
 	}
 }
 

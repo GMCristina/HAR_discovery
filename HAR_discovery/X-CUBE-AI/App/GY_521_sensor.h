@@ -59,10 +59,16 @@ extern float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
 
 extern int16_t n_interrupts;
 extern uint8_t idx;
+extern uint8_t n_giri;
 
 extern int8_t flag_first;
+extern int8_t flag_acquire;
 extern int8_t count_first_frame;
 extern uint32_t tickstart, tickend, n_tick;
+extern int8_t flag_first_net;
+extern uint32_t tickstart_net, tickend_net, n_tick_net;
+extern int8_t flag_first_frame;
+extern uint32_t tickstart_frame, tickend_frame, n_tick_frame;
 
 void MPU6050_Init (void);
 void MPU6050_Read_Accel (void);

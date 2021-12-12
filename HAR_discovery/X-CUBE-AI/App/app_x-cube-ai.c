@@ -176,11 +176,23 @@ static int ai_run(void *data_in, void *data_out)
 int acquire_and_process_data(void * data)
  {
 
-
+	/*if (flag_first_net == 1) {
+		tickstart_net = HAL_GetTick();
+		flag_first_net = 0;
+	} else {
+		tickend_net = HAL_GetTick();
+		n_tick_net = tickend_net - tickstart_net;
+		tickstart_net = tickend_net;
+		printf("Nuova rete dopo tick(ms): %d \r\n", n_tick_net);
+		float freq_net = 1000 / n_tick_net;
+		printf("Frequenza rete (Hz): %f \r\n", freq_net);
+	}
+*/
 	ai_i8 *pointer = (ai_i8*) data;
-
+	flag_acquire = 0;
 	MPU6050_Conv_Order_Frame();
-	MPU6050_Print_Frame_Part();
+	flag_acquire = 1;
+	//MPU6050_Print_Frame_Part();
 
 	for (uint8_t j = 0; j < dim_frame; ++j) {
 		*(ai_float*) (pointer + j * 12) = Queue_Ax[j];
@@ -211,6 +223,7 @@ int post_process(void * data)
 
 		}
 		//printf("Somma probabilità = %.3f \r\n", somma);
+		/*
 		switch (classe){
 		case 1: printf("Classe: Downstairs (%d) \r\n", classe); break;
 		case 2:printf("Classe: Jogging (%d) \r\n", classe); break;
@@ -220,6 +233,7 @@ int post_process(void * data)
 		case 6:printf("Classe: Walking (%d) \r\n", classe); break;
 		}
 	  printf("Probabilità: %.2f %% \r\n", max*100);
+	  */
   return 0;
 }
 /* USER CODE END 2 */

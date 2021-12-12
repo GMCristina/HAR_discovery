@@ -24,10 +24,17 @@ float Ax, Ay, Az;
 
 int16_t n_interrupts = 0;
 uint8_t idx = 0;
+uint8_t n_giri = 0;
 
 int8_t flag_first = 1;
+int8_t flag_acquire =1;
 int8_t count_first_frame = 0;
 uint32_t tickstart =0 , tickend = 0, n_tick = 0;
+
+int8_t flag_first_net=1;
+uint32_t tickstart_net, tickend_net, n_tick_net;
+int8_t flag_first_frame=1;
+uint32_t tickstart_frame, tickend_frame, n_tick_frame;
 
 int16_t Queue_Ax_Raw[dim_frame], Queue_Ay_Raw[dim_frame], Queue_Az_Raw[dim_frame];
 float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
@@ -148,22 +155,26 @@ void MPU6050_Print_Accel(void){
 }
 
 void MPU6050_Conv_Order_Frame (void){
-	for (uint8_t j = dim_frame-1; j >= 0; j--) {
+	//printf("idx %d \r\n",idx);
+	//printf("n_giri %d \r\n",n_giri);
+	for (int8_t j = dim_frame-1; j >= 0; j--) {
 		Queue_Ax[j] = (Queue_Ax_Raw[idx] / LSB_Sensitivity) * g;
 		Queue_Ay[j] = (Queue_Ay_Raw[idx] / LSB_Sensitivity) * g;
 		Queue_Az[j] = (Queue_Az_Raw[idx] / LSB_Sensitivity) * g;
+		//printf("indice: %d \r\n",j);
 		if (idx == 0) {
 			idx = dim_frame-1;
 		} else {
 			idx--;
 		}
 	}
-
-	/*for(uint8_t j=0;j<=dim_frame;j++){
+/*
+	for(uint8_t j=0;j<=dim_frame;j++){
 		Queue_Ax[j] = (Queue_Ax_Raw[j] / LSB_Sensitivity) * g;
 				Queue_Ay[j] = (Queue_Ay_Raw[j] / LSB_Sensitivity) * g;
 				Queue_Az[j] = (Queue_Az_Raw[j] / LSB_Sensitivity) * g;
-	}*/
+	}
+	*/
 }
 
 void MPU6050_Print_Frame (void){
