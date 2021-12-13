@@ -18,6 +18,7 @@
 
 //Sensor registers
 #define SMPLRT_DIV_REG 0x19 //Sample rate divider
+#define CONFIG_REG 0x1A //Filter and freq
 #define PWR_MGMT_1_REG 0x6B //Power management 1
 #define WHO_AM_I_REG 0x75 //Who am I
 

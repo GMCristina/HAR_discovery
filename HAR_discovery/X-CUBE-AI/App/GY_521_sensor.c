@@ -69,12 +69,22 @@ void MPU6050_Init (void)
 		printf("Errore");
 	}
 
-	// Set DATA RATE of 40 Hz by writing SMPLRT_DIV register
+	// Filter
+	// Enable Digital Low Pass Filter with delay 2ms
+	// to have Gyro freq 1kHz
+	Data = 0x01;
+	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, CONFIG_REG, 1, &Data, 1,
+			1000) != HAL_OK) {
+		printf("Errore");
+	}
+
+
+	// Set DATA RATE of 20 Hz by writing SMPLRT_DIV register
 	// Sample Rate = Gyroscope Output Rate / (1 + SMPLRT_DIV)
 	// where Gyroscope Output Rate = 8kHz when the DLPF is disabled (DLPF_CFG = 0 or 7),
-	// and 1kHz when the DLPF is enabled (see Register 26).
-	// SMPLRT_DIV =199 -> Sample Rate = 40 Hz
-	Data = 0xC7;
+	// and 1kHz when the DLPF is enabled .
+	// SMPLRT_DIV =49 -> Sample Rate = 20 Hz
+	Data = 0x31;
 	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, SMPLRT_DIV_REG, 1, &Data, 1,
 			1000) != HAL_OK) {
 		printf("Errore");
