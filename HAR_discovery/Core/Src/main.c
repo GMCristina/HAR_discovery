@@ -106,7 +106,7 @@ int main(void) {
 	while (1) {
 		/* USER CODE END WHILE */
 
-		//MX_X_CUBE_AI_Process();
+		MX_X_CUBE_AI_Process();
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */
@@ -495,35 +495,8 @@ static void MX_GPIO_Init(void) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
 	{
-		if (flag_acquire == 1) {
-			if (flag_first == 1) {
-				//printf("Primo dato \r\n");
-				flag_first = 0;
-				tickstart = HAL_GetTick();
-				MPU6050_Read_Accel_Raw(idx);
-				n_campioni++;
-				count_first_frame++;
+		n_campioni++;
 
-			} else {
-				tickend = HAL_GetTick();
-				n_tick = tickend - tickstart;
-				tickstart = tickend;
-				printf("Nuovo dato dopo tick(ms): %d \r\n", n_tick);
-				float freq = 1000 / n_tick;
-				printf("Frequenza (Hz): %f \r\n", freq);
-				idx = (idx + 1) % dim_frame;
-				MPU6050_Read_Accel_Raw(idx);
-				n_campioni++;
-
-				if (count_first_frame < dim_frame) {
-					count_first_frame++;
-				}
-			}
-			n_interrupts++;
-
-		} else {
-			printf("Campione perso \r\n");
-		}
 	}
 }
 
@@ -534,12 +507,12 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
  * @retval None
  */
 void Error_Handler(void) {
-/* USER CODE BEGIN Error_Handler_Debug */
-/* User can add his own implementation to report the HAL error return state */
-__disable_irq();
-while (1) {
-}
-/* USER CODE END Error_Handler_Debug */
+	/* USER CODE BEGIN Error_Handler_Debug */
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1) {
+	}
+	/* USER CODE END Error_Handler_Debug */
 }
 
 #ifdef  USE_FULL_ASSERT

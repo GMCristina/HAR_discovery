@@ -61,7 +61,10 @@ extern float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
 extern int16_t n_interrupts;
 extern uint8_t idx;
 extern uint8_t n_giri;
+
 extern uint16_t n_campioni;
+extern int8_t flag_first_frame;
+extern int8_t flag_half_frame;
 
 extern int8_t flag_first;
 extern int8_t flag_acquire;
@@ -69,7 +72,6 @@ extern int8_t count_first_frame;
 extern uint32_t tickstart, tickend, n_tick;
 extern int8_t flag_first_net;
 extern uint32_t tickstart_net, tickend_net, n_tick_net;
-extern int8_t flag_first_frame;
 extern uint32_t tickstart_frame, tickend_frame, n_tick_frame;
 
 void MPU6050_Init (void);
@@ -80,6 +82,9 @@ void MPU6050_Read_Accel_Raw (uint8_t);
 void MPU6050_Conv_Order_Frame (void);
 void MPU6050_Print_Frame (void);
 void MPU6050_Print_Frame_Part (void);
+
+void MPU6050_Read_FIFO_45(uint8_t);
+void MPU6050_Conv_Frame (void);
 
 
 #endif /* APP_GY_521_SENSOR_H_ */
