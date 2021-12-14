@@ -100,19 +100,6 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	MPU6050_Init();
 
-	// Reset FIFO
-	uint8_t Data = 0x04;
-	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-			1000) != HAL_OK) {
-		printf("Errore");
-	}
-	Data = 0x40;
-	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-			1000) != HAL_OK) {
-		printf("Errore");
-	}
-
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -120,9 +107,10 @@ int main(void) {
 	while (1) {
 		/* USER CODE END WHILE */
 
-		//MX_X_CUBE_AI_Process();
+		MX_X_CUBE_AI_Process();
+/*
 		printf("attesa \r\n");
-		HAL_Delay(100);
+		HAL_Delay(200);
 		printf("fine attesa\r\n");
 		uint8_t Rec_Data[2];
 		uint16_t fifo_count;
@@ -139,24 +127,11 @@ int main(void) {
 
 		MPU6050_Read_FIFO_n(fifo_count);
 		//MPU6050_Read_FIFO_1();
-		printf("ACC reg \r\n");
+		printf("ACC reg ora \r\n");
 		MPU6050_Read_Accel ();
 		MPU6050_Print_Accel();
-/*
-		for(uint16_t n = fifo_count;n >0;n-=6){
-		printf("n: %d \r\n",n);
-		MPU6050_Read_FIFO_1();
-		MPU6050_Print_Accel();
-		}
-
-		// Reset FIFO
-		uint8_t Data = 0x04;
-		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-				1000) != HAL_OK) {
-			printf("Errore");
-		}
-
 */
+
 		/* USER CODE BEGIN 3 */
 	}
 	/* USER CODE END 3 */

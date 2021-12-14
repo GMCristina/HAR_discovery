@@ -83,8 +83,6 @@ void MPU6050_Print_Frame (void);
 void MPU6050_Print_Frame_Part (void);
 
 void MPU6050_Read_FIFO_45(uint8_t);
-void MPU6050_Read_FIFO_45_2(uint8_t);
-void MPU6050_Read_FIFO_1();
 void MPU6050_Read_FIFO_n(uint16_t);
 void MPU6050_Conv_Frame (void);
 

@@ -172,54 +172,12 @@ void MPU6050_Read_Accel_Raw(uint8_t i) {
 }
 
 void MPU6050_Read_FIFO_45(uint8_t i) {
-	uint8_t Rec_Data[2];
-	for (uint8_t j = 0; j < 45; j++) {
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 1,
-				1000) != HAL_OK) {
-			printf("Errore");
-		}
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
-				Rec_Data + 1, 1, 1000) != HAL_OK) {
-			printf("Errore");
-		}
-		Queue_Ax_Raw[i] = (int16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
-
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 1,
-				1000) != HAL_OK) {
-			printf("Errore");
-		}
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
-				Rec_Data + 1, 1, 1000) != HAL_OK) {
-			printf("Errore");
-		}
-		Queue_Ay_Raw[i] = (int16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
-
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 1,
-				1000) != HAL_OK) {
-			printf("Errore");
-		}
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
-				Rec_Data + 1, 1, 1000) != HAL_OK) {
-			printf("Errore");
-		}
-		Queue_Az_Raw[i] = (int16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
-		i++;
-	}
-
-}
-
-void MPU6050_Read_FIFO_45_2(uint8_t i) {
 	uint8_t Rec_Data[270];
 	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 270,
 			1000) != HAL_OK) {
 		printf("Errore");
 	}
-	// Reset FIFO
-	uint8_t Data = 0x04;
-	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-			1000) != HAL_OK) {
-		printf("Errore");
-	}
+
 
 	for (uint16_t j = 0; j < 270; j += 6) {
 
@@ -238,55 +196,25 @@ void MPU6050_Read_FIFO_45_2(uint8_t i) {
 
 }
 
-void MPU6050_Read_FIFO_1() {
-	uint8_t Rec_Data[6];
-	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 6,
-			1000) != HAL_OK) {
-		printf("Errore");
-	}
 
-	// Reset FIFO
-		uint8_t Data = 0x04;
-		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-				1000) != HAL_OK) {
-			printf("Errore");
-		}
-
-	//Queue_Ax_Raw[i] = (int16_t) (Rec_Data[j] << 8 | Rec_Data[j + 1]);
-	//Queue_Ay_Raw[i] = (int16_t) (Rec_Data[j + 2] << 8 | Rec_Data[j + 3]);
-	//Queue_Az_Raw[i] = (int16_t) (Rec_Data[j + 4] << 8 | Rec_Data[j + 5]);
-	Accel_X_RAW = (int16_t) Rec_Data[0] << 8 | (int16_t) Rec_Data[1];
-	Accel_Y_RAW = (int16_t) Rec_Data[2] << 8 | (int16_t) Rec_Data[3];
-	Accel_Z_RAW = (int16_t) Rec_Data[4] << 8 | (int16_t) Rec_Data[5];
-
-	Ax = Accel_X_RAW / LSB_Sensitivity;
-	Ay = Accel_Y_RAW / LSB_Sensitivity;
-	Az = Accel_Z_RAW / LSB_Sensitivity;
-
-	Ax = Ax * g; // m/s^2
-	Ay = Ay * g;
-	Az = Az * g;
-
-	printf("Ax: %.2f \t Ay: %.2f \t Az: %.2f [m/s^2]\r\n", Ax, Ay, Az);
-
-}
 
 void MPU6050_Read_FIFO_n(uint16_t n) {
 	uint8_t Rec_Data[n];
 
-	/*if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, n,
+	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, n,
 	 1000) != HAL_OK) {
 	 printf("Errore");
 	 }
-	 */
 
-	for (uint16_t k = 0; k < n; k++) {
+
+	/*for (uint16_t k = 0; k < n; k++) {
 		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
 				Rec_Data + k, 1, 1000) != HAL_OK) {
 			printf("Errore");
 		}
 	}
-
+	*/
+/*
 	// Reset FIFO
 	uint8_t Data = 0x04;
 	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
@@ -298,7 +226,7 @@ void MPU6050_Read_FIFO_n(uint16_t n) {
 				1000) != HAL_OK) {
 			printf("Errore");
 		}
-
+*/
 	for (uint16_t j = 0; j < n; j += 6) {
 
 		Accel_X_RAW = (int16_t) Rec_Data[j] << 8 | (int16_t) Rec_Data[j + 1];
