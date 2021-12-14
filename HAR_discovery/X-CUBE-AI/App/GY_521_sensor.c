@@ -70,6 +70,14 @@ void MPU6050_Init(void) {
 		printf("Errore");
 	}
 
+	// Set accelerometer configuration in ACCEL_CONFIG Register
+	// XA_ST=0,YA_ST=0,ZA_ST=0, FS_SEL=1 -> ± 4g
+	Data = 0x08;
+	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, ACCEL_CONFIG_REG, 1, &Data, 1,
+			1000) != HAL_OK) {
+		printf("Errore");
+	}
+
 	// Filter
 	// Enable Digital Low Pass Filter with delay 2ms
 	// to have Gyro freq 1kHz
@@ -101,14 +109,6 @@ void MPU6050_Init(void) {
 	Data = 0x08;
 	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, FIFO_EN_REG, 1, &Data, 1, 1000)
 			!= HAL_OK) {
-		printf("Errore");
-	}
-
-	// Set accelerometer configuration in ACCEL_CONFIG Register
-	// XA_ST=0,YA_ST=0,ZA_ST=0, FS_SEL=1 -> ± 4g
-	Data = 0x08;
-	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, ACCEL_CONFIG_REG, 1, &Data, 1,
-			1000) != HAL_OK) {
 		printf("Errore");
 	}
 
@@ -208,6 +208,119 @@ void MPU6050_Read_FIFO_45(uint8_t i) {
 
 }
 
+void MPU6050_Read_FIFO_45_2(uint8_t i) {
+	uint8_t Rec_Data[270];
+	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 270,
+			1000) != HAL_OK) {
+		printf("Errore");
+	}
+	// Reset FIFO
+	uint8_t Data = 0x04;
+	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+			1000) != HAL_OK) {
+		printf("Errore");
+	}
+
+	for (uint16_t j = 0; j < 270; j += 6) {
+
+		//Queue_Ax_Raw[i] = (int16_t) (Rec_Data[j] << 8 | Rec_Data[j + 1]);
+		//Queue_Ay_Raw[i] = (int16_t) (Rec_Data[j + 2] << 8 | Rec_Data[j + 3]);
+		//Queue_Az_Raw[i] = (int16_t) (Rec_Data[j + 4] << 8 | Rec_Data[j + 5]);
+		Queue_Ax_Raw[i] = (int16_t) Rec_Data[j] << 8
+				| (int16_t) Rec_Data[j + 1];
+		Queue_Ay_Raw[i] = (int16_t) Rec_Data[j + 2] << 8
+				| (int16_t) Rec_Data[j + 3];
+		Queue_Az_Raw[i] = (int16_t) Rec_Data[j + 4] << 8
+				| (int16_t) Rec_Data[j + 5];
+
+		i++;
+	}
+
+}
+
+void MPU6050_Read_FIFO_1() {
+	uint8_t Rec_Data[6];
+	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 6,
+			1000) != HAL_OK) {
+		printf("Errore");
+	}
+
+	// Reset FIFO
+		uint8_t Data = 0x04;
+		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+				1000) != HAL_OK) {
+			printf("Errore");
+		}
+
+	//Queue_Ax_Raw[i] = (int16_t) (Rec_Data[j] << 8 | Rec_Data[j + 1]);
+	//Queue_Ay_Raw[i] = (int16_t) (Rec_Data[j + 2] << 8 | Rec_Data[j + 3]);
+	//Queue_Az_Raw[i] = (int16_t) (Rec_Data[j + 4] << 8 | Rec_Data[j + 5]);
+	Accel_X_RAW = (int16_t) Rec_Data[0] << 8 | (int16_t) Rec_Data[1];
+	Accel_Y_RAW = (int16_t) Rec_Data[2] << 8 | (int16_t) Rec_Data[3];
+	Accel_Z_RAW = (int16_t) Rec_Data[4] << 8 | (int16_t) Rec_Data[5];
+
+	Ax = Accel_X_RAW / LSB_Sensitivity;
+	Ay = Accel_Y_RAW / LSB_Sensitivity;
+	Az = Accel_Z_RAW / LSB_Sensitivity;
+
+	Ax = Ax * g; // m/s^2
+	Ay = Ay * g;
+	Az = Az * g;
+
+	printf("Ax: %.2f \t Ay: %.2f \t Az: %.2f [m/s^2]\r\n", Ax, Ay, Az);
+
+}
+
+void MPU6050_Read_FIFO_n(uint16_t n) {
+	uint8_t Rec_Data[n];
+
+	/*if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, n,
+	 1000) != HAL_OK) {
+	 printf("Errore");
+	 }
+	 */
+
+	for (uint16_t k = 0; k < n; k++) {
+		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
+				Rec_Data + k, 1, 1000) != HAL_OK) {
+			printf("Errore");
+		}
+	}
+
+	// Reset FIFO
+	uint8_t Data = 0x04;
+	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+			1000) != HAL_OK) {
+		printf("Errore");
+	}
+	Data = 0x40;
+		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+				1000) != HAL_OK) {
+			printf("Errore");
+		}
+
+	for (uint16_t j = 0; j < n; j += 6) {
+
+		Accel_X_RAW = (int16_t) Rec_Data[j] << 8 | (int16_t) Rec_Data[j + 1];
+		Accel_Y_RAW = (int16_t) Rec_Data[j + 2] << 8
+				| (int16_t) Rec_Data[j + 3];
+		Accel_Z_RAW = (int16_t) Rec_Data[j + 4] << 8
+				| (int16_t) Rec_Data[j + 5];
+
+		Ax = Accel_X_RAW / LSB_Sensitivity;
+		Ay = Accel_Y_RAW / LSB_Sensitivity;
+		Az = Accel_Z_RAW / LSB_Sensitivity;
+
+		Ax = Ax * g; // m/s^2
+		Ay = Ay * g;
+		Az = Az * g;
+
+		printf("Ax: %.2f \t Ay: %.2f \t Az: %.2f [m/s^2]\r\n", Ax, Ay, Az);
+
+	}
+
+}
+
 void MPU6050_Print_Accel(void) {
 	printf("Ax: %.2f [m/s^2]\r\n", Ax);
 	printf("Ay: %.2f [m/s^2]\r\n", Ay);
@@ -215,14 +328,14 @@ void MPU6050_Print_Accel(void) {
 }
 
 void MPU6050_Conv_Order_Frame(void) {
-	for(int8_t j = 0; j<45; j++){
+	for (int8_t j = 0; j < 45; j++) {
 		Queue_Ax[j] = Queue_Ax[j + 45];
 		Queue_Ay[j] = Queue_Ay[j + 45];
 		Queue_Az[j] = Queue_Az[j + 45];
 	}
 
 	int8_t i = 0;
-	for (int8_t j = 45 ; j < dim_frame; j++) {
+	for (int8_t j = 45; j < dim_frame; j++) {
 		Queue_Ax[j] = (Queue_Ax_Raw[i] / LSB_Sensitivity) * g;
 		Queue_Ay[j] = (Queue_Ay_Raw[i] / LSB_Sensitivity) * g;
 		Queue_Az[j] = (Queue_Az_Raw[i] / LSB_Sensitivity) * g;

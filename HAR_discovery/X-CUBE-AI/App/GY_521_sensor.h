@@ -29,7 +29,6 @@
 #define TEMP_OUT_H_REG 0x41 //Temperature measurement
 #define GYRO_XOUT_H_REG 0x43 //Gyroscope measurements
 
-
 #define INT_PIN_CFG_REG 0x37 //Interrupt configuration
 #define INT_ENABLE_REG 0x38 //Interrupt enable
 #define INT_STATUS_REG 0x3A //Interrupt status
@@ -84,6 +83,9 @@ void MPU6050_Print_Frame (void);
 void MPU6050_Print_Frame_Part (void);
 
 void MPU6050_Read_FIFO_45(uint8_t);
+void MPU6050_Read_FIFO_45_2(uint8_t);
+void MPU6050_Read_FIFO_1();
+void MPU6050_Read_FIFO_n(uint16_t);
 void MPU6050_Conv_Frame (void);
 
 
