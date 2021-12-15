@@ -497,15 +497,15 @@ static void MX_GPIO_Init(void) {
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
 	{
-		/*uint8_t check;
+		uint8_t check;
 
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, WHO_AM_I_REG, 1, &check, 1, 1000)
+		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, INT_STATUS_REG, 1, &check, 1, 1000)
 				!= HAL_OK) {
 			printf("Errore \r\n");
 		}
 
 		printf("Int status: %d \r\n", check);
-*/
+
 	}
 }
 
