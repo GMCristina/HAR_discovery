@@ -180,7 +180,7 @@ int acquire_and_process_data(void *data) {
 		flag_first_frame = 0;
 
 
-		// Reset FIFO
+		// Reset and reable FIFO
 			uint8_t Data = 0x04;
 			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
 					1000) != HAL_OK) {
@@ -191,11 +191,6 @@ int acquire_and_process_data(void *data) {
 					1000) != HAL_OK) {
 				printf("Errore");
 			}
-
-		//while (n_campioni < 45) {
-		//	printf("Attesa \r\n");
-		//}
-		//n_campioni = n_campioni - 45;
 
 		uint8_t Rec_Data[2];
 		uint16_t fifo_count=0;
@@ -214,9 +209,7 @@ int acquire_and_process_data(void *data) {
 		printf("FIFO COUNT: %d \r\n", fifo_count);
 
 		MPU6050_Read_FIFO_45(0);
-		//while (n_campioni < 45) {
-		//}
-		//n_campioni = n_campioni - 45;
+
 		fifo_count = 0;
 		while(fifo_count <270){
 		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1,
@@ -237,10 +230,6 @@ int acquire_and_process_data(void *data) {
 		MPU6050_Conv_Frame();
 
 	} else {
-
-		//while (n_campioni < 45) {
-		//}
-		//n_campioni = n_campioni - 45;
 
 		uint8_t Rec_Data[2];
 		uint16_t fifo_count=0;
