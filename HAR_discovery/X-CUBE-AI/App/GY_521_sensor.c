@@ -173,9 +173,18 @@ void MPU6050_Read_Accel_Raw(uint8_t i) {
 
 void MPU6050_Read_FIFO_45(uint8_t i) {
 	uint8_t Rec_Data[270];
-	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 270,
-			1000) != HAL_OK) {
-		printf("Errore");
+
+	HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 270,
+			1000);
+
+	if (ret != HAL_OK) {
+		printf("Errore i2c read FIFO \r\n");
+		switch(ret){
+		case HAL_ERROR : printf("Error\r\n"); break;
+		case HAL_BUSY: printf("Busy\r\n");break;
+		case HAL_TIMEOUT: printf("Timeout\r\n");break;
+		}
+		return;
 	}
 
 
@@ -298,3 +307,4 @@ void MPU6050_Print_Frame_Part(void) {
 	printf("89 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n",
 			Queue_Ax[89], Queue_Ay[89], Queue_Az[89]);
 }
+

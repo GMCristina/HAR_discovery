@@ -1,7 +1,7 @@
 {
     "_allocate_inputs": 0,
     "_allocate_outputs": 0,
-    "cli_parameters": "generate --name har_5 -m C:/Users/Utente/Desktop/model.h5 --type keras --compression 4 --verbosity 1 --workspace C:\\Users\\Utente\\AppData\\Local\\Temp\\mxAI_workspace96345137266430011405592912417626206 --output C:\\Users\\Utente\\.stm32cubemx",
+    "cli_parameters": "generate --name har_5 -m C:/Users/Utente/Desktop/model.h5 --type keras --compression 4 --verbosity 1 --workspace C:\\Users\\Utente\\AppData\\Local\\Temp\\mxAI_workspace146911870818930016204014289623334969 --output C:\\Users\\Utente\\.stm32cubemx",
     "cli_version": {
         "major": 1,
         "micro": 1,
@@ -14,7 +14,7 @@
             "dense_1_weights": 4.0
         }
     },
-    "date_time": "Fri Dec 10 20:20:37 2021",
+    "date_time": "Thu Dec 16 16:48:27 2021",
     "error": 0,
     "error_str": [],
     "exec_cmd": "generate",

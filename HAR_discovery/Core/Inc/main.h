@@ -158,8 +158,6 @@ void Error_Handler(void);
 #define VBUS_HS_GPIO_Port GPIOB
 #define OTG_HS_DM_Pin GPIO_PIN_14
 #define OTG_HS_DM_GPIO_Port GPIOB
-#define OTG_HS_DP_Pin GPIO_PIN_15
-#define OTG_HS_DP_GPIO_Port GPIOB
 #define D13_Pin GPIO_PIN_8
 #define D13_GPIO_Port GPIOD
 #define D14_Pin GPIO_PIN_9
@@ -204,9 +202,6 @@ void Error_Handler(void);
 #define SWDIO_GPIO_Port GPIOA
 #define SWCLK_Pin GPIO_PIN_14
 #define SWCLK_GPIO_Port GPIOA
-#define TP_INT1_Pin GPIO_PIN_15
-#define TP_INT1_GPIO_Port GPIOA
-#define TP_INT1_EXTI_IRQn EXTI15_10_IRQn
 #define R2_Pin GPIO_PIN_10
 #define R2_GPIO_Port GPIOC
 #define D2_Pin GPIO_PIN_0
