@@ -241,48 +241,45 @@ int acquire_and_process_data(void *data) {
 			HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR,
 					FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
 
-			if (ret != HAL_OK) {
+			while (ret != HAL_OK) {
 				printf("Errore i2c read count1 \r\n");
 				switch (ret) {
 				case HAL_ERROR:
 					printf("Error\r\n");
+					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
 					break;
 				case HAL_BUSY:
 					printf("Busy\r\n");
+					Recovery_i2c();
+					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
 					break;
 				case HAL_TIMEOUT:
 					printf("Timeout\r\n");
 					break;
 				}
-				if(ret==HAL_BUSY){
-					Recovery_i2c();
-					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR,
-										FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
-				}
-				}
+			}
 
 			ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
 					Rec_Data + 1, 1, 1000);
 
-			if (ret != HAL_OK) {
+			while (ret != HAL_OK) {
 				printf("Errore i2c read count2 \r\n");
 				switch (ret) {
 				case HAL_ERROR:
 					printf("Error\r\n");
+					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1, Rec_Data + 1, 1, 1000);
 					break;
 				case HAL_BUSY:
 					printf("Busy\r\n");
+					Recovery_i2c();
+					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1, Rec_Data + 1, 1, 1000);
 					break;
 				case HAL_TIMEOUT:
 					printf("Timeout\r\n");
 					break;
 				}
-				if(ret==HAL_BUSY){
-					Recovery_i2c();
-					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
-										Rec_Data + 1, 1, 1000);
-				}
-				}
+
+			}
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 
 		}
