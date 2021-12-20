@@ -43,6 +43,8 @@
 
 extern I2C_HandleTypeDef hi2c3;
 
+extern TIM_HandleTypeDef htim1;
+
 extern float g;
 extern float LSB_Sensitivity;
 
@@ -85,6 +87,9 @@ void MPU6050_Print_Frame_Part (void);
 void MPU6050_Read_FIFO_45(uint8_t);
 void MPU6050_Read_FIFO_n(uint16_t);
 void MPU6050_Conv_Frame (void);
+
+void Recovery_i2c(void);
+void delay_us(uint16_t);
 
 
 

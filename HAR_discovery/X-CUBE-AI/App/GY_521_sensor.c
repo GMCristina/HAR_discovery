@@ -174,19 +174,24 @@ void MPU6050_Read_Accel_Raw(uint8_t i) {
 void MPU6050_Read_FIFO_45(uint8_t i) {
 	uint8_t Rec_Data[270];
 
-	HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, 270,
-			1000);
+	HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG,
+			1, Rec_Data, 270, 1000);
 
 	if (ret != HAL_OK) {
 		printf("Errore i2c read FIFO \r\n");
-		switch(ret){
-		case HAL_ERROR : printf("Error\r\n"); break;
-		case HAL_BUSY: printf("Busy\r\n");break;
-		case HAL_TIMEOUT: printf("Timeout\r\n");break;
+		switch (ret) {
+		case HAL_ERROR:
+			printf("Error\r\n");
+			break;
+		case HAL_BUSY:
+			printf("Busy\r\n");
+			break;
+		case HAL_TIMEOUT:
+			printf("Timeout\r\n");
+			break;
 		}
 		return;
 	}
-
 
 	for (uint16_t j = 0; j < 270; j += 6) {
 
@@ -205,37 +210,34 @@ void MPU6050_Read_FIFO_45(uint8_t i) {
 
 }
 
-
-
 void MPU6050_Read_FIFO_n(uint16_t n) {
 	uint8_t Rec_Data[n];
 
 	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1, Rec_Data, n,
-	 1000) != HAL_OK) {
-	 printf("Errore");
-	 }
-
-
-	/*for (uint16_t k = 0; k < n; k++) {
-		if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
-				Rec_Data + k, 1, 1000) != HAL_OK) {
-			printf("Errore");
-		}
-	}
-	*/
-/*
-	// Reset FIFO
-	uint8_t Data = 0x04;
-	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
 			1000) != HAL_OK) {
 		printf("Errore");
 	}
-	Data = 0x40;
-		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-				1000) != HAL_OK) {
-			printf("Errore");
-		}
-*/
+
+	/*for (uint16_t k = 0; k < n; k++) {
+	 if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_R_W_REG, 1,
+	 Rec_Data + k, 1, 1000) != HAL_OK) {
+	 printf("Errore");
+	 }
+	 }
+	 */
+	/*
+	 // Reset FIFO
+	 uint8_t Data = 0x04;
+	 if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+	 1000) != HAL_OK) {
+	 printf("Errore");
+	 }
+	 Data = 0x40;
+	 if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+	 1000) != HAL_OK) {
+	 printf("Errore");
+	 }
+	 */
 	for (uint16_t j = 0; j < n; j += 6) {
 
 		Accel_X_RAW = (int16_t) Rec_Data[j] << 8 | (int16_t) Rec_Data[j + 1];
@@ -306,5 +308,39 @@ void MPU6050_Print_Frame_Part(void) {
 			Queue_Ax[45], Queue_Ay[45], Queue_Az[45]);
 	printf("89 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n",
 			Queue_Ax[89], Queue_Ay[89], Queue_Az[89]);
+}
+
+void Recovery_i2c(void) {
+	printf("Start recovery \r\n");
+	printf("Deinit \r\n");
+	HAL_I2C_DeInit(&hi2c3);
+
+	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
+
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+
+	GPIO_InitStruct.Pin = GPIO_PIN_8;
+	GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+	GPIO_InitStruct.Pull = GPIO_NOPULL;
+	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+	for (int i = 0; i < 10; i++) {
+		printf("Invio clock %d \r\n", i);
+		delay_us(10);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+		delay_us(10);
+		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+	}
+	printf("Deinit \r\n");
+	HAL_I2C_DeInit(&hi2c3);
+	printf("Init \r\n");
+	HAL_I2C_Init(&hi2c3);
+
+}
+
+void delay_us(uint16_t us) {
+	__HAL_TIM_SET_COUNTER(&htim1, 0);  // set the counter value a 0
+	while (__HAL_TIM_GET_COUNTER(&htim1) < us);  // wait for the counter to reach the us input in the parameter
 }
 
