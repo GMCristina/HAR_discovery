@@ -299,20 +299,21 @@ void MPU6050_Print_Frame(void) {
 }
 
 void MPU6050_Print_Frame_Part(void) {
-	printf("NEW FRAME \r\n");
-	printf("0 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n", Queue_Ax[0],
+
+	printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n");
+	printf("Sample 0:\tAx= %.2f\tAy= %.2f\tAz= %.2f\t[m/s^2]\r\n", Queue_Ax[0],
 			Queue_Ay[0], Queue_Az[0]);
-	printf("44 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n",
+	printf("Sample 44:\tAx= %.2f\tAy= %.2f\tAz= %.2f\t[m/s^2]\r\n",
 			Queue_Ax[44], Queue_Ay[44], Queue_Az[44]);
-	printf("45 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n",
+	printf("Sample 45:\tAx= %.2f\tAy= %.2f\tAz= %.2f\t[m/s^2]\r\n",
 			Queue_Ax[45], Queue_Ay[45], Queue_Az[45]);
-	printf("89 \t Ax: %.2f \t Ay: %.2f \t Az: %.2f \t [m/s^2]\r\n",
+	printf("Sample 89:\tAx= %.2f\tAy= %.2f\tAz= %.2f\t[m/s^2]\r\n",
 			Queue_Ax[89], Queue_Ay[89], Queue_Az[89]);
 }
 
 void Recovery_i2c(void) {
-	printf("Start recovery \r\n");
-	printf("Deinit \r\n");
+	//printf("Start recovery \r\n");
+	//printf("Deinit \r\n");
 	HAL_I2C_DeInit(&hi2c3);
 
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
@@ -326,15 +327,15 @@ void Recovery_i2c(void) {
 	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	for (int i = 0; i < 10; i++) {
-		printf("Invio clock %d \r\n", i);
+		//printf("Invio clock %d \r\n", i);
 		delay_us(10);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
 		delay_us(10);
 		HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
 	}
-	printf("Deinit \r\n");
+	//printf("Deinit \r\n");
 	HAL_I2C_DeInit(&hi2c3);
-	printf("Init \r\n");
+	//printf("Init \r\n");
 	HAL_I2C_Init(&hi2c3);
 
 }

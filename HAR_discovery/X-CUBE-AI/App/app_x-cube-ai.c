@@ -188,12 +188,12 @@ int acquire_and_process_data(void *data) {
 		uint8_t Data = 0x04;
 		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
 				1000) != HAL_OK) {
-			printf("Errore");
+			//printf("Errore");
 		}
 		Data = 0x40;
 		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
 				1000) != HAL_OK) {
-			printf("Errore");
+			//printf("Errore");
 		}
 
 		uint8_t Rec_Data[2];
@@ -201,16 +201,16 @@ int acquire_and_process_data(void *data) {
 		while (fifo_count < 270) {
 			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1,
 					Rec_Data, 1, 1000) != HAL_OK) {
-				printf("Errore");
+				//printf("Errore");
 			}
 			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
 					Rec_Data + 1, 1, 1000) != HAL_OK) {
-				printf("Errore");
+				//printf("Errore");
 			}
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 		}
 
-		printf("FIFO COUNT: %d \r\n", fifo_count);
+		//printf("FIFO COUNT: %d \r\n", fifo_count);
 
 		MPU6050_Read_FIFO_45(0);
 
@@ -218,17 +218,17 @@ int acquire_and_process_data(void *data) {
 		while (fifo_count < 270) {
 			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1,
 					Rec_Data, 1, 1000) != HAL_OK) {
-				printf("Errore");
+				//printf("Errore");
 			}
 			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
 					Rec_Data + 1, 1, 1000) != HAL_OK) {
-				printf("Errore");
+				//printf("Errore");
 			}
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 
 		}
 
-		printf("FIFO COUNT: %d \r\n", fifo_count);
+		//printf("FIFO COUNT: %d \r\n", fifo_count);
 		MPU6050_Read_FIFO_45(45);
 
 		MPU6050_Conv_Frame();
@@ -242,19 +242,19 @@ int acquire_and_process_data(void *data) {
 					FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
 
 			while (ret != HAL_OK) {
-				printf("Errore i2c read count1 \r\n");
+				//printf("Errore i2c read count1 \r\n");
 				switch (ret) {
 				case HAL_ERROR:
-					printf("Error\r\n");
+					//printf("Error\r\n");
 					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
 					break;
 				case HAL_BUSY:
-					printf("Busy\r\n");
+					//printf("Busy\r\n");
 					Recovery_i2c();
 					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
 					break;
 				case HAL_TIMEOUT:
-					printf("Timeout\r\n");
+					//printf("Timeout\r\n");
 					break;
 				}
 			}
@@ -263,19 +263,19 @@ int acquire_and_process_data(void *data) {
 					Rec_Data + 1, 1, 1000);
 
 			while (ret != HAL_OK) {
-				printf("Errore i2c read count2 \r\n");
+				//printf("Errore i2c read count2 \r\n");
 				switch (ret) {
 				case HAL_ERROR:
-					printf("Error\r\n");
+					//printf("Error\r\n");
 					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1, Rec_Data + 1, 1, 1000);
 					break;
 				case HAL_BUSY:
-					printf("Busy\r\n");
+					//printf("Busy\r\n");
 					Recovery_i2c();
 					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1, Rec_Data + 1, 1, 1000);
 					break;
 				case HAL_TIMEOUT:
-					printf("Timeout\r\n");
+					//printf("Timeout\r\n");
 					break;
 				}
 
@@ -283,7 +283,7 @@ int acquire_and_process_data(void *data) {
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 
 		}
-		printf("FIFO COUNT: %d \r\n", fifo_count);
+		//printf("FIFO COUNT: %d \r\n", fifo_count);
 		MPU6050_Read_FIFO_45(0);
 		MPU6050_Conv_Order_Frame();
 	}
@@ -320,25 +320,26 @@ int post_process(void *data) {
 
 	switch (classe) {
 	case 1:
-		printf("Classe: Downstairs (%d) \r\n", classe);
+		printf("Activity: DOWNSTAIRS");
 		break;
 	case 2:
-		printf("Classe: Jogging (%d) \r\n", classe);
+		printf("Activity: JOGGING");
 		break;
 	case 3:
-		printf("Classe: Sitting (%d) \r\n", classe);
+		printf("Activity: SITTING");
 		break;
 	case 4:
-		printf("Classe: Standing (%d) \r\n", classe);
+		printf("Activity: STANDING");
 		break;
 	case 5:
-		printf("Classe: Upstairs (%d) \r\n", classe);
+		printf("Activity: UPSTAIRS");
 		break;
 	case 6:
-		printf("Classe: Walking (%d) \r\n", classe);
+		printf("Activity: WALKING");
 		break;
 	}
-	printf("Probabilità: %.2f %% \r\n", max * 100);
+	printf("\t\t\t\t   Probability: %.2f%% \r\n", max * 100);
+	printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
 
 	return 0;
 }
@@ -350,7 +351,7 @@ int post_process(void *data) {
 void MX_X_CUBE_AI_Init(void)
 {
     /* USER CODE BEGIN 5 */
-	printf("\r\nTEMPLATE - initialization\r\n");
+	//printf("\r\nTEMPLATE - initialization\r\n");
 
 	ai_boostrap(ai_har_5_data_weights_get(), activations);
     /* USER CODE END 5 */
@@ -363,7 +364,7 @@ void MX_X_CUBE_AI_Process(void)
 	uint8_t *in_data = NULL;
 	uint8_t *out_data = NULL;
 
-	printf("TEMPLATE - run - main loop\r\n");
+	//printf("TEMPLATE - run - main loop\r\n");
 
 	if (har_5) {
 
