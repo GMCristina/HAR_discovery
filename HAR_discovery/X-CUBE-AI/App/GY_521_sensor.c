@@ -24,8 +24,10 @@ int16_t n_interrupts = 0;
 uint8_t idx = 0;
 
 uint16_t n_campioni = 0;
-int8_t flag_first_frame = 1;
 int8_t flag_half_frame = 1;
+
+int8_t flag_first_frame = 1;
+int8_t flag_FIFO_overflow = 0;
 
 int8_t flag_first = 1;
 int8_t flag_acquire = 1;
@@ -119,8 +121,8 @@ void MPU6050_Init(void) {
 		printf("Errore");
 	}
 
-	// Enable Data Ready Interrupt
-	Data = 0x01;
+	// Enable Fifo overflow Interrupt
+	Data = 0x10;
 	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, INT_ENABLE_REG, 1, &Data, 1,
 			1000) != HAL_OK) {
 		printf("Errore");

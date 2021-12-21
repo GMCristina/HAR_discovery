@@ -560,28 +560,7 @@ static void MX_GPIO_Init(void)
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
 	{
-		printf("Interrupt 12 \r\n");
-		uint8_t check;
-
-		HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR,
-				INT_STATUS_REG, 1, &check, 1, 1000);
-		if (ret != HAL_OK) {
-			printf("Errore i2c interrupt \r\n");
-			switch (ret) {
-			case HAL_ERROR:
-				printf("Error\r\n");
-				break;
-			case HAL_BUSY:
-				printf("Busy\r\n");
-				break;
-			case HAL_TIMEOUT:
-				printf("Timeout\r\n");
-				break;
-			}
-			return;
-		}
-
-		printf("Int status: %d \r\n", check);
+		flag_FIFO_overflow = 1;
 
 	}
 

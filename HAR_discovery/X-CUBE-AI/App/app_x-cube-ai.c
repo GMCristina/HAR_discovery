@@ -168,6 +168,8 @@ static int ai_run(void *data_in, void *data_out)
   if (batch != 1) {
     ai_log_err(ai_har_5_get_error(har_5),
         "ai_har_5_run");
+    ai_error err = { AI_ERROR_INVALID_STATE, AI_ERROR_CODE_NETWORK };
+    ai_log_err(err, "Process has FAILED");
     return -1;
   }
 
@@ -210,9 +212,28 @@ int acquire_and_process_data(void *data) {
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 		}
 
-		//printf("FIFO COUNT: %d \r\n", fifo_count);
+		printf("FIFO COUNT first 1: %d \r\n", fifo_count);
 
 		MPU6050_Read_FIFO_45(0);
+
+		if(flag_FIFO_overflow == 1){
+			flag_FIFO_overflow = 0;
+			flag_first_frame = 1;
+
+			// Reset and reable FIFO
+			uint8_t Data = 0x04;
+			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+					1000) != HAL_OK) {
+				//printf("Errore");
+			}
+			Data = 0x40;
+			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+					1000) != HAL_OK) {
+				//printf("Errore");
+			}
+
+			return -1;
+		}
 
 		fifo_count = 0;
 		while (fifo_count < 270) {
@@ -228,8 +249,27 @@ int acquire_and_process_data(void *data) {
 
 		}
 
-		//printf("FIFO COUNT: %d \r\n", fifo_count);
+		printf("FIFO COUNT first 2: %d \r\n", fifo_count);
 		MPU6050_Read_FIFO_45(45);
+
+		if(flag_FIFO_overflow == 1){
+			flag_FIFO_overflow = 0;
+			flag_first_frame = 1;
+
+			// Reset and reable FIFO
+			uint8_t Data = 0x04;
+			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+					1000) != HAL_OK) {
+				//printf("Errore");
+			}
+			Data = 0x40;
+			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+					1000) != HAL_OK) {
+				//printf("Errore");
+			}
+
+			return -1;
+		}
 
 		MPU6050_Conv_Frame();
 
@@ -283,8 +323,26 @@ int acquire_and_process_data(void *data) {
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 
 		}
-		//printf("FIFO COUNT: %d \r\n", fifo_count);
+		printf("FIFO COUNT: %d \r\n", fifo_count);
 		MPU6050_Read_FIFO_45(0);
+		if(flag_FIFO_overflow == 1){
+			flag_FIFO_overflow = 0;
+			flag_first_frame = 1;
+
+			// Reset and reable FIFO
+			uint8_t Data = 0x04;
+			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+					1000) != HAL_OK) {
+				//printf("Errore");
+			}
+			Data = 0x40;
+			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
+					1000) != HAL_OK) {
+				//printf("Errore");
+			}
+
+			return -1;
+		}
 		MPU6050_Conv_Order_Frame();
 	}
 
@@ -341,6 +399,10 @@ int post_process(void *data) {
 	printf("\t\t\t\t   Probability: %.2f%% \r\n", max * 100);
 	printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
 
+	if(classe == 4) {
+		printf("Ritardo\r\n");
+		HAL_Delay(10000);
+	}
 	return 0;
 }
 /* USER CODE END 2 */
@@ -397,25 +459,23 @@ void MX_X_CUBE_AI_Process(void)
 
 		/* 2 - main loop */
 
-		do {
+		while(1) {
 
 			/* 1 - acquire and pre-process input data */
 			res = acquire_and_process_data(in_data);
 			/* 2 - process the data - call inference engine */
-			if (res == 0)
-				res = ai_run(in_data, out_data);
+			if (res == -1) {
+				printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n");
+				printf("\t\t\t    FIFO OVERFLOW!\r\n");
+				printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
+			} else {
+				ai_run(in_data, out_data);
 			/* 3- post-process the predictions */
-			if (res == 0)
-				res = post_process(out_data);
-
-			flag_acquire = 1;
-		} while (res == 0);
+				post_process(out_data);
+			}
+		};
 	}
 
-	if (res) {
-		ai_error err = { AI_ERROR_INVALID_STATE, AI_ERROR_CODE_NETWORK };
-		ai_log_err(err, "Process has FAILED");
-	}
     /* USER CODE END 6 */
 }
 #ifdef __cplusplus
