@@ -212,7 +212,7 @@ int acquire_and_process_data(void *data) {
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 		}
 
-		printf("FIFO COUNT first 1: %d \r\n", fifo_count);
+		//printf("FIFO COUNT first 1: %d \r\n", fifo_count);
 
 		MPU6050_Read_FIFO_45(0);
 
@@ -249,7 +249,7 @@ int acquire_and_process_data(void *data) {
 
 		}
 
-		printf("FIFO COUNT first 2: %d \r\n", fifo_count);
+		//printf("FIFO COUNT first 2: %d \r\n", fifo_count);
 		MPU6050_Read_FIFO_45(45);
 
 		if(flag_FIFO_overflow == 1){
@@ -323,7 +323,7 @@ int acquire_and_process_data(void *data) {
 			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
 
 		}
-		printf("FIFO COUNT: %d \r\n", fifo_count);
+		//printf("FIFO COUNT: %d \r\n", fifo_count);
 		MPU6050_Read_FIFO_45(0);
 		if(flag_FIFO_overflow == 1){
 			flag_FIFO_overflow = 0;
@@ -398,11 +398,12 @@ int post_process(void *data) {
 	}
 	printf("\t\t\t\t   Probability: %.2f%% \r\n", max * 100);
 	printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
-
+/*
 	if(classe == 4) {
 		printf("Ritardo\r\n");
 		HAL_Delay(10000);
 	}
+*/
 	return 0;
 }
 /* USER CODE END 2 */
