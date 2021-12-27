@@ -103,8 +103,8 @@ int main(void)
   MX_TIM1_Init();
   MX_X_CUBE_AI_Init();
   /* USER CODE BEGIN 2 */
-	MPU6050_Init();
 	HAL_TIM_Base_Start(&htim1);
+	MPU6050_Init();
 
   /* USER CODE END 2 */
 

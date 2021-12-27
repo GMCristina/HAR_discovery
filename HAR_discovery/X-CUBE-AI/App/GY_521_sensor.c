@@ -48,15 +48,10 @@ float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
 // Register 117: 0x68 (who_am_I)
 
 void MPU6050_Init(void) {
+	Recovery_i2c();
+
 	uint8_t check;
 	uint8_t Data;
-
-	//Force Device Reset
-	Data = 0x80;
-	if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, PWR_MGMT_1_REG, 1, &Data, 1,
-			1000) != HAL_OK) {
-		printf("Errore");
-	}
 
 	//check device ID WHO_AM_I
 	if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, WHO_AM_I_REG, 1, &check, 1, 1000)
