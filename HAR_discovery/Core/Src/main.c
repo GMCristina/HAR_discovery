@@ -106,6 +106,8 @@ int main(void)
 	HAL_TIM_Base_Start(&htim1);
 	MPU6050_Init();
 
+	printf("\r\nSTART HAR\r\n\n");
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

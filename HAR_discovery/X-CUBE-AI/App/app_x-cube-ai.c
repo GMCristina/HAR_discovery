@@ -345,7 +345,6 @@ int acquire_and_process_data(void *data) {
 		}
 		MPU6050_Conv_Order_Frame();
 	}
-
 	MPU6050_Print_Frame_Part();
 	for (uint8_t j = 0; j < dim_frame; ++j) {
 		*(ai_float*) (pointer + j * 12) = Queue_Ax[j];
