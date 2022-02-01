@@ -23,6 +23,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+// Include sensor's header file
 #include "GY_521_sensor.h"
 /* USER CODE END Includes */
 
@@ -103,11 +104,12 @@ int main(void)
   MX_TIM1_Init();
   MX_X_CUBE_AI_Init();
   /* USER CODE BEGIN 2 */
+  // Start timer for I2C recovery
 	HAL_TIM_Base_Start(&htim1);
+  // Initialize sensor MPU-6050
 	MPU6050_Init();
 
 	printf("\r\nSTART HAR\r\n\n");
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -560,12 +562,11 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 // EXTI Line12 External Interrupt ISR Handler CallBackFun
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
-	if (GPIO_Pin == GPIO_PIN_12) // If The INT Source Is EXTI Line12 (A12 Pin)
+	// If the interrupt source is A12 Pin, set FIFO overflow's flag = 1
+	if (GPIO_Pin == GPIO_PIN_12)
 	{
 		flag_FIFO_overflow = 1;
-
 	}
-
 }
 
 /* USER CODE END 4 */

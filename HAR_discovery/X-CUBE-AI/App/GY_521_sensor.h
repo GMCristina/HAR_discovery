@@ -1,99 +1,92 @@
-/*
- * GY_521_sensor.h
- *
- *  Created on: Dec 8, 2021
- *      Author: M.Cristina Giannini
- */
+/*GY_521_sensor.h
+ * Header file for sensor's management
+*/
 
 #ifndef APP_GY_521_SENSOR_H_
 #define APP_GY_521_SENSOR_H_
+
+//************************** INCLUDE *************************************
 
 #include "main.h"
 #include "app_x-cube-ai.h"
 #include <stdio.h>
 
+//************************************************************************
+//************************** DEFINE **************************************
 
-//Sensor I2C address
+//Sensor's I2C address
 #define MPU6050_ADDR 0xD0
 
-//Sensor registers
-#define SMPLRT_DIV_REG 0x19 //Sample rate divider
-#define CONFIG_REG 0x1A //Filter and freq
-#define PWR_MGMT_1_REG 0x6B //Power management 1
-#define WHO_AM_I_REG 0x75 //Who am I
+//Sensor's registers
+#define SMPLRT_DIV_REG 0x19 //Sample Rate Divider
+#define CONFIG_REG 0x1A //Configuration
+#define PWR_MGMT_1_REG 0x6B //Power Management 1
+#define ACCEL_CONFIG_REG 0x1C //Accelerometer Configuration
+#define ACCEL_XOUT_H_REG 0x3B //Accelerometer Measurements
+#define INT_PIN_CFG_REG 0x37 //INT Pin / Bypass Enable Configuration
+#define INT_ENABLE_REG 0x38 //Interrupt Enable
+#define FIFO_EN_REG 0x23 //FIFO Enable
+#define FIFO_R_W_REG 0x74 //FIFO Read Write
+#define FIFO_COUNT_H_REG 0x72 //FIFO Count H
+#define FIFO_COUNT_L_REG 0x73 //FIFO Count L
+#define USER_CTRL_REG 0x6A //User Control
 
-#define ACCEL_CONFIG_REG 0x1C //Accelerometer configuration
-#define ACCEL_XOUT_H_REG 0x3B //Accelerometer measurements
-
-#define GYRO_CONFIG_REG 0x1B //Gyroscope configuration
-#define TEMP_OUT_H_REG 0x41 //Temperature measurement
-#define GYRO_XOUT_H_REG 0x43 //Gyroscope measurements
-
-#define INT_PIN_CFG_REG 0x37 //Interrupt configuration
-#define INT_ENABLE_REG 0x38 //Interrupt enable
-#define INT_STATUS_REG 0x3A //Interrupt status
-
-#define FIFO_EN_REG 0x23 //Choose FIFO data
-#define FIFO_R_W_REG 0x74 //Read FIFO data
-#define FIFO_COUNT_H_REG 0x72 //FIFO count 1
-#define FIFO_COUNT_L_REG 0x73 //FIFO count 2
-#define USER_CTRL_REG 0x6A //FIFO enable
-
+//Frame's dimension
 #define dim_frame 90
 
-extern I2C_HandleTypeDef hi2c3;
+//************************************************************************
+//************************** EXTERNAL VARIABLES **************************
 
+//Main
+extern I2C_HandleTypeDef hi2c3;
 extern TIM_HandleTypeDef htim1;
 
+//Gravity acceleration
 extern float g;
+//Sensor's sensitivity
 extern float LSB_Sensitivity;
 
-
-extern int16_t Accel_X_RAW;
-extern int16_t Accel_Y_RAW;
-extern int16_t Accel_Z_RAW;
-
-
-extern float Ax, Ay, Az;
-
+//Samples raw frame
 extern int16_t Queue_Ax_Raw[dim_frame], Queue_Ay_Raw[dim_frame], Queue_Az_Raw[dim_frame];
+//Sample frame
 extern float Queue_Ax[dim_frame], Queue_Ay[dim_frame], Queue_Az[dim_frame];
 
-extern int16_t n_interrupts;
-extern uint8_t idx;
-extern uint8_t n_giri;
-
-extern uint16_t n_campioni;
-extern int8_t flag_half_frame;
-
-extern int8_t flag_first;
-extern int8_t flag_acquire;
-extern int8_t count_first_frame;
-extern uint32_t tickstart, tickend, n_tick;
-extern int8_t flag_first_net;
-extern uint32_t tickstart_net, tickend_net, n_tick_net;
-extern uint32_t tickstart_frame, tickend_frame, n_tick_frame;
-
+//Flag first frame
 extern int8_t flag_first_frame;
+//Flag FIFO overflow interrupt
 extern int8_t flag_FIFO_overflow;
 
+//************************************************************************
+//************************** FUNCTIONS ***********************************
+
+//Sensor's initialization
 void MPU6050_Init (void);
-void MPU6050_Read_Accel (void);
-void MPU6050_Print_Accel(void);
 
-void MPU6050_Read_Accel_Raw (uint8_t);
+//50% overlapping management (translation of the frame's second half in the first half)
+//and convert raw data into accelerometric measurements
 void MPU6050_Conv_Order_Frame (void);
-void MPU6050_Print_Frame (void);
-void MPU6050_Print_Frame_Part (void);
 
-void MPU6050_Read_FIFO_45(uint8_t);
-void MPU6050_Read_FIFO_n(uint16_t);
+//Convert raw data into accelerometric measurements
 void MPU6050_Conv_Frame (void);
 
+//NN's inputs print
+void MPU6050_Print_Frame_Part (void);
+
+//Read 45 x 3 acquisitions (X,Y,Z) from FIFO buffer
+void MPU6050_Read_FIFO_45(uint8_t);
+
+//I2C recovery
 void Recovery_i2c(void);
+
+//Delay in microseconds for I2C recovery
 void delay_us(uint16_t);
 
+//Reset and reable FIFO buffer
+void Reset_Reable_FIFO(void);
 
+//Read FIFO Count register
+uint16_t Read_FIFO_Count(void);
 
+//************************************************************************
 
 #endif /* APP_GY_521_SENSOR_H_ */

@@ -77,6 +77,7 @@
 #include "ai_datatypes_defines.h"
 
 /* USER CODE BEGIN includes */
+ // Include sensor's header file
 #include "GY_521_sensor.h"
 /* USER CODE END includes */
 /* Global AI objects */
@@ -177,175 +178,100 @@ static int ai_run(void *data_in, void *data_out)
 }
 
 /* USER CODE BEGIN 2 */
+// Function to acquire and pre-process NN's input data
 int acquire_and_process_data(void *data) {
 
 	ai_i8 *pointer = (ai_i8*) data;
 
-	//Primo frame
+	uint16_t fifo_count;
+
+	// First frame
 	if (flag_first_frame == 1) {
 
 		flag_first_frame = 0;
 
 		// Reset and reable FIFO
-		uint8_t Data = 0x04;
-		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-				1000) != HAL_OK) {
-			//printf("Errore");
-		}
-		Data = 0x40;
-		if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-				1000) != HAL_OK) {
-			//printf("Errore");
-		}
+		Reset_Reable_FIFO();
 
-		uint8_t Rec_Data[2];
-		uint16_t fifo_count = 0;
-		while (fifo_count < 270) {
-			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1,
-					Rec_Data, 1, 1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
-					Rec_Data + 1, 1, 1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
-		}
-
-		//printf("FIFO COUNT first 1: %d \r\n", fifo_count);
-
-		MPU6050_Read_FIFO_45(0);
-
-		if(flag_FIFO_overflow == 1){
-			flag_FIFO_overflow = 0;
-			flag_first_frame = 1;
-
-			// Reset and reable FIFO
-			uint8_t Data = 0x04;
-			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-					1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			Data = 0x40;
-			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-					1000) != HAL_OK) {
-				//printf("Errore");
-			}
-
-			return -1;
-		}
-
+		// Waiting for 45 x 3 new acquisitions (135 x 2 byte) from FIFO buffer
 		fifo_count = 0;
 		while (fifo_count < 270) {
-			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1,
-					Rec_Data, 1, 1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			if (HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
-					Rec_Data + 1, 1, 1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
-
+			//Read FIFO Count
+			fifo_count = Read_FIFO_Count();
 		}
 
-		//printf("FIFO COUNT first 2: %d \r\n", fifo_count);
-		MPU6050_Read_FIFO_45(45);
+		// Read first 45 x 3 acquisitions (X,Y,Z) from FIFO buffer
+		MPU6050_Read_FIFO_45(0);
 
+		// Check FIFO buffer Overflow Interrupt
 		if(flag_FIFO_overflow == 1){
 			flag_FIFO_overflow = 0;
 			flag_first_frame = 1;
 
 			// Reset and reable FIFO
-			uint8_t Data = 0x04;
-			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-					1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			Data = 0x40;
-			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-					1000) != HAL_OK) {
-				//printf("Errore");
-			}
+			Reset_Reable_FIFO();
 
 			return -1;
 		}
 
+		// Waiting for other 45 x 3 new acquisitions (135 x 2 byte) from FIFO buffer
+		fifo_count = 0;
+		while (fifo_count < 270) {
+			//Read FIFO Count
+			fifo_count = Read_FIFO_Count();
+		}
+
+		// Read second 45 x 3 acquisitions (X,Y,Z) from FIFO buffer
+		MPU6050_Read_FIFO_45(45);
+
+		// Check FIFO buffer Overflow Interrupt
+		if(flag_FIFO_overflow == 1){
+			flag_FIFO_overflow = 0;
+			flag_first_frame = 1;
+
+			// Reset and reable FIFO
+			Reset_Reable_FIFO();
+
+			return -1;
+		}
+
+		// Convert raw data into accelerometric measurements (m/s^2)
 		MPU6050_Conv_Frame();
 
 	} else {
 
-		uint8_t Rec_Data[2];
-		uint16_t fifo_count = 0;
+		// Not first frame, 50% frame overlapping
+
+		// Waiting for new 45 x 3 new acquisitions (135 x 2 byte) from FIFO buffer
+		fifo_count = 0;
 		while (fifo_count < 270) {
-			HAL_StatusTypeDef ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR,
-					FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
-
-			while (ret != HAL_OK) {
-				//printf("Errore i2c read count1 \r\n");
-				switch (ret) {
-				case HAL_ERROR:
-					//printf("Error\r\n");
-					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
-					break;
-				case HAL_BUSY:
-					//printf("Busy\r\n");
-					Recovery_i2c();
-					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
-					break;
-				case HAL_TIMEOUT:
-					//printf("Timeout\r\n");
-					break;
-				}
-			}
-
-			ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1,
-					Rec_Data + 1, 1, 1000);
-
-			while (ret != HAL_OK) {
-				//printf("Errore i2c read count2 \r\n");
-				switch (ret) {
-				case HAL_ERROR:
-					//printf("Error\r\n");
-					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1, Rec_Data + 1, 1, 1000);
-					break;
-				case HAL_BUSY:
-					//printf("Busy\r\n");
-					Recovery_i2c();
-					ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_L_REG, 1, Rec_Data + 1, 1, 1000);
-					break;
-				case HAL_TIMEOUT:
-					//printf("Timeout\r\n");
-					break;
-				}
-
-			}
-			fifo_count = (uint16_t) (Rec_Data[0] << 8 | Rec_Data[1]);
-
+			//Read FIFO Count
+			fifo_count = Read_FIFO_Count();
 		}
-		//printf("FIFO COUNT: %d \r\n", fifo_count);
+
+		// Read new 45 x 3 acquisitions (X,Y,Z) from FIFO buffer
 		MPU6050_Read_FIFO_45(0);
+
+		// Check FIFO buffer Overflow Interrupt
 		if(flag_FIFO_overflow == 1){
 			flag_FIFO_overflow = 0;
 			flag_first_frame = 1;
 
 			// Reset and reable FIFO
-			uint8_t Data = 0x04;
-			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-					1000) != HAL_OK) {
-				//printf("Errore");
-			}
-			Data = 0x40;
-			if (HAL_I2C_Mem_Write(&hi2c3, MPU6050_ADDR, USER_CTRL_REG, 1, &Data, 1,
-					1000) != HAL_OK) {
-				//printf("Errore");
-			}
+			Reset_Reable_FIFO();
 
 			return -1;
 		}
+
+		// 50% overlapping management (translation of the frame's second half in the first half)
+		// and convert raw data into accelerometric measurements
 		MPU6050_Conv_Order_Frame();
 	}
+
+	// NN's inputs print
 	MPU6050_Print_Frame_Part();
+
+	// NN's inputs
 	for (uint8_t j = 0; j < dim_frame; ++j) {
 		*(ai_float*) (pointer + j * 12) = Queue_Ax[j];
 		*(ai_float*) (pointer + j * 12 + 4) = Queue_Ay[j];
@@ -355,27 +281,24 @@ int acquire_and_process_data(void *data) {
 	return 0;
 }
 
+// Function to post-process NN's output data
 int post_process(void *data) {
 	ai_i8 *pointer = (ai_i8*) data;
 
-	float max;
-	ai_u8 classe;
-	float somma;
-	float output[6];
+	float max = 0;
+	ai_u8 activity;
 
+	// Research for max probability's activity
 	for (ai_size j = 0; j < 6; ++j) {
 		float value = *(ai_float*) (pointer + j * 4);
-		output[j] = value;
-		somma = somma + value;
 		if (value >= max) {
 			max = value;
-			classe = j + 1;
+			activity = j + 1;
 		}
-
 	}
-	//printf("Somma probabilità = %.3f \r\n", somma);
 
-	switch (classe) {
+	// Print of max probability's activity
+	switch (activity) {
 	case 1:
 		printf("Activity: DOWNSTAIRS");
 		break;
@@ -397,12 +320,12 @@ int post_process(void *data) {
 	}
 	printf("\t\t\t\t   Probability: %.2f%% \r\n", max * 100);
 	printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
-/*
-	if(classe == 4) {
-		printf("Ritardo\r\n");
+
+	if(activity == 4) {
+		printf("Delay 10 seconds\r\n");
 		HAL_Delay(10000);
 	}
-*/
+
 	return 0;
 }
 /* USER CODE END 2 */
@@ -463,14 +386,16 @@ void MX_X_CUBE_AI_Process(void)
 
 			/* 1 - acquire and pre-process input data */
 			res = acquire_and_process_data(in_data);
-			/* 2 - process the data - call inference engine */
+
+			/* 2a - FIFO overflow management */
 			if (res == -1) {
 				printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n");
 				printf("\t\t\t    FIFO OVERFLOW!\r\n");
 				printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
 			} else {
+				/* 2b - process the data - call inference engine */
 				ai_run(in_data, out_data);
-			/* 3- post-process the predictions */
+				/* 3- post-process the predictions */
 				post_process(out_data);
 			}
 		};
