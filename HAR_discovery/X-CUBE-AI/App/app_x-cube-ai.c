@@ -169,8 +169,6 @@ static int ai_run(void *data_in, void *data_out)
   if (batch != 1) {
     ai_log_err(ai_har_5_get_error(har_5),
         "ai_har_5_run");
-    ai_error err = { AI_ERROR_INVALID_STATE, AI_ERROR_CODE_NETWORK };
-    ai_log_err(err, "Process has FAILED");
     return -1;
   }
 
@@ -321,10 +319,12 @@ int post_process(void *data) {
 	printf("\t\t\t\t   Probability: %.2f%% \r\n", max * 100);
 	printf("* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\r\n\n");
 
-	if(activity == 4) {
+// Delay to force and test FIFO overflow
+/*	if(activity == 4) {
 		printf("Delay 10 seconds\r\n");
 		HAL_Delay(10000);
 	}
+*/
 
 	return 0;
 }

@@ -254,12 +254,12 @@
             ]
         },
         {
-            "c_bits": 32,
+            "c_bits": 8,
             "c_id": 10,
-            "c_size_in_byte": 2883584,
+            "c_size_in_byte": 721920,
             "c_type": "const float",
-            "conv_type": "",
-            "format": "float",
+            "conv_type": "c8",
+            "format": "c8 (LUT8)",
             "mem_pool": "weights",
             "name": "dense_1_weights_array",
             "offset": "NULL",
@@ -458,7 +458,7 @@
             "macc": 721024,
             "name": "dense_1",
             "next": "dense_1_nl",
-            "rom": 2884096,
+            "rom": 722432,
             "tensors": {
                 "inputs": [
                     "conv2d_1_output0"
@@ -586,7 +586,7 @@
     "c_weights_count": 1,
     "c_weights_header": 0,
     "data_alignment": 4,
-    "date_time": "Wed Jan 26 11:39:04 2022",
+    "date_time": "Wed Feb  2 12:22:45 2022",
     "inputs": [
         "input_0_output"
     ],
@@ -598,7 +598,7 @@
             24
         ],
         "series": "generic",
-        "weights": 2955800
+        "weights": 794136
     },
     "model_name": "model",
     "outputs": [
@@ -622,5 +622,5 @@
         "minor": 5
     },
     "version": "1.1",
-    "weights": 2955800
+    "weights": 794136
 }

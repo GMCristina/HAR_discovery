@@ -2,12 +2,12 @@
   ******************************************************************************
   * @file    har_5.c
   * @author  AST Embedded Analytics Research Platform
-  * @date    Mon Dec 20 14:05:21 2021
+  * @date    Wed Feb  2 12:22:45 2022
   * @brief   AI Tool Automatic Code Generator for Embedded NN computing
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2021 STMicroelectronics.
+  * Copyright (c) 2022 STMicroelectronics.
   * All rights reserved.
   *
   * This software component is licensed by ST under Ultimate Liberty license
@@ -43,7 +43,7 @@
 #endif
 
 #undef AI_TOOLS_DATE_TIME
-#define AI_TOOLS_DATE_TIME   "Mon Dec 20 14:05:21 2021"
+#define AI_TOOLS_DATE_TIME   "Wed Feb  2 12:22:45 2022"
 
 #undef AI_TOOLS_COMPILE_TIME
 #define AI_TOOLS_COMPILE_TIME    __DATE__ " " __TIME__
