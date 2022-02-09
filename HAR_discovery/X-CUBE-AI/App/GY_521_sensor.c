@@ -330,7 +330,7 @@ uint16_t Read_FIFO_Count(){
 			//I2C recovery
 			Recovery_i2c();
 		}
-		ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data, 1, 1000);
+		ret = HAL_I2C_Mem_Read(&hi2c3, MPU6050_ADDR, FIFO_COUNT_H_REG, 1, Rec_Data + 1, 1, 1000);
 	}
 
 	//Get FIFO Count value
